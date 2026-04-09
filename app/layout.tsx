@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import BackToTop from "@/components/BackToTop";
 import "./globals.css";
 
@@ -27,6 +28,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-7P8FD6DS4N"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7P8FD6DS4N');`}
+        </Script>
+      </head>
       <body className="antialiased min-h-screen flex flex-col">
         <header className="sticky top-0 z-40 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 shadow-md">
           <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
