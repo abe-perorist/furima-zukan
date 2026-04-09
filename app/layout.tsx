@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://furima-zukan.vercel.app"
   ),
+  verification: {
+    google: "9_7WNXbEXl8TNZVEKDAUI1LKPdeXN2Zm4t4tAlQB-3o",
+  },
   openGraph: {
     siteName: "フリマ図鑑",
     locale: "ja_JP",
