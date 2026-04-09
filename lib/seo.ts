@@ -14,6 +14,11 @@ export function generateFleaMarketMetadata(market: FleaMarket): Metadata {
       description,
       type: "website",
     },
+    twitter: {
+      card: "summary_large_image" as const,
+      title: market.name,
+      description,
+    },
   };
 }
 

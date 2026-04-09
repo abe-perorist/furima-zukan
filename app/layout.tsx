@@ -22,6 +22,12 @@ export const metadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "フリマ図鑑 | 全国のフリーマーケット情報",
+    description:
+      "全国のフリーマーケット情報を掲載。骨董・アンティーク・ハンドメイド・雑貨など。都道府県別・カテゴリ別に検索できます。",
+  },
 };
 
 export default function RootLayout({
@@ -33,11 +39,11 @@ export default function RootLayout({
     <html lang="ja">
       <head>
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-7P8FD6DS4N"
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID ?? "G-7P8FD6DS4N"}`}
           strategy="afterInteractive"
         />
         <Script id="gtag-init" strategy="afterInteractive">
-          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7P8FD6DS4N');`}
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID ?? "G-7P8FD6DS4N"}');`}
         </Script>
       </head>
       <body className="antialiased min-h-screen flex flex-col">

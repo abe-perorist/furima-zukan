@@ -9,6 +9,26 @@ import FleaMarketListClient from "@/components/FleaMarketListClient";
 import NearbySearch from "@/components/NearbySearch";
 import Link from "next/link";
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "https://furima-zukan.vercel.app";
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "フリマ図鑑",
+  url: BASE_URL,
+  description:
+    "全国のフリーマーケット情報を掲載。骨董・アンティーク・ハンドメイド・雑貨など。都道府県別・カテゴリ別に検索できます。",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${BASE_URL}/?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
 const REGIONS = [
   { label: "北海道・東北", prefs: ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"] },
   { label: "関東", prefs: ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"] },
@@ -39,6 +59,13 @@ export default function HomePage() {
   });
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
     <div>
       {/* Hero section */}
       <div className="bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 rounded-3xl p-6 md:p-10 mb-8 border-2 border-emerald-200/50">
@@ -149,5 +176,6 @@ export default function HomePage() {
         </div>
       </section>
     </div>
+    </>
   );
 }
