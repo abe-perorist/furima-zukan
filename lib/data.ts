@@ -27,7 +27,8 @@ export interface FleaMarket {
   venue: string;
   schedule_text: string;
   schedule_rule: string;
-  upcoming_dates: string[]; // YYYY-MM-DD, ビルド時に schedule_rule から生成
+  extra_dates: string; // CSV raw: "YYYY-MM-DD,YYYY-MM-DD,..."
+  upcoming_dates: string[]; // YYYY-MM-DD, schedule_rule + extra_dates から生成
   opening_hours: string;
   entry_fee: string;
   is_free_entry: boolean;
@@ -121,7 +122,18 @@ export function getAllFleaMarkets(): FleaMarket[] {
         venue: get("venue"),
         schedule_text: get("schedule_text"),
         schedule_rule: get("schedule_rule"),
-        upcoming_dates: generateUpcomingDates(get("schedule_rule")).map(toISODate),
+        extra_dates: get("extra_dates"),
+        upcoming_dates: (() => {
+          const ruleDates = generateUpcomingDates(get("schedule_rule")).map(toISODate);
+          const extraRaw = get("extra_dates");
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const todayStr = toISODate(today);
+          const extraDates = extraRaw
+            ? extraRaw.split(",").map((d) => d.trim()).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= todayStr)
+            : [];
+          return [...new Set([...ruleDates, ...extraDates])].sort();
+        })(),
         opening_hours: get("opening_hours"),
         entry_fee: get("entry_fee"),
         is_free_entry: parseBool(get("is_free_entry")),

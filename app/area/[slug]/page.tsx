@@ -1,45 +1,46 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  getAllPrefectures,
-  getFleaMarketsByPrefecture,
-  getCitiesByPrefecture,
-} from "@/lib/data";
+import type { Metadata } from "next";
+import { getAllPrefectures, getFleaMarketsByPrefecture, getCitiesByPrefecture } from "@/lib/data";
+import { slugToPref, prefToSlug, PREF_TO_SLUG } from "@/lib/prefectureSlug";
 import { generatePrefectureMetadata } from "@/lib/seo";
-import { prefToSlug } from "@/lib/prefectureSlug";
 import StatChip from "@/components/StatChip";
 import DateGroupedFleaMarketList from "@/components/DateGroupedFleaMarketList";
-import type { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ pref: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return getAllPrefectures().map((pref) => ({ pref }));
+  return getAllPrefectures()
+    .filter((pref) => pref in PREF_TO_SLUG)
+    .map((pref) => ({ slug: prefToSlug(pref) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { pref } = await params;
-  const decoded = decodeURIComponent(pref);
-  const markets = getFleaMarketsByPrefecture(decoded);
+  const { slug } = await params;
+  const pref = slugToPref(slug);
+  if (!pref) return {};
+  const markets = getFleaMarketsByPrefecture(pref);
   if (markets.length === 0) return {};
-  const base = generatePrefectureMetadata(decoded, markets.length);
+  const base = generatePrefectureMetadata(pref, markets.length);
   return {
     ...base,
-    alternates: { canonical: `/area/${prefToSlug(decoded)}` },
+    alternates: {
+      canonical: `/area/${slug}`,
+    },
   };
 }
 
-export default async function PrefecturePage({ params }: Props) {
-  const { pref } = await params;
-  const prefecture = decodeURIComponent(pref);
-  const markets = getFleaMarketsByPrefecture(prefecture);
+export default async function AreaPage({ params }: Props) {
+  const { slug } = await params;
+  const prefecture = slugToPref(slug);
+  if (!prefecture) notFound();
 
+  const markets = getFleaMarketsByPrefecture(prefecture);
   if (markets.length === 0) notFound();
 
   const cities = getCitiesByPrefecture(prefecture);
-
   const freeCount = markets.filter((m) => m.is_free_entry).length;
   const foodCount = markets.filter((m) => m.has_food).length;
   const parkingCount = markets.filter((m) => m.has_parking).length;
@@ -48,6 +49,8 @@ export default async function PrefecturePage({ params }: Props) {
     <div>
       <nav className="text-sm text-emerald-700 mb-6 flex flex-wrap gap-1 items-center">
         <Link href="/" className="hover:text-emerald-600">🏠 ホーム</Link>
+        <span className="text-emerald-400">/</span>
+        <Link href="/area" className="hover:text-emerald-600">エリア一覧</Link>
         <span className="text-emerald-400">/</span>
         <span className="text-emerald-900 font-medium">{prefecture}</span>
       </nav>
@@ -87,7 +90,7 @@ export default async function PrefecturePage({ params }: Props) {
 
       <DateGroupedFleaMarketList
         markets={markets}
-        basePath={`/prefecture/${encodeURIComponent(prefecture)}`}
+        basePath={`/area/${slug}`}
       />
 
       <div className="mt-8">
